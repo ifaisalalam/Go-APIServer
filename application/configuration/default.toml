@@ -1,0 +1,14 @@
+[cache]
+driver = "redis"
+[cache.redisConfig]
+host = "localhost"
+port = "6379"
+database = 0
+password = ""
+
+[mysql]
+dsn = ""
+address = "localhost"
+database = "api"
+user = "root"
+password = ""

@@ -1,0 +1,125 @@
+swagger: "2.0"
+
+info:
+  title: Go API Server
+  description: Go API Server
+  version: 1.0.0
+
+schemes:
+  - http
+host: 0.0.0.0
+basePath: /api
+
+consumes:
+  - application/json
+produces:
+  - application/json
+
+paths:
+  /internal/liveness:
+    get:
+      operationId: Liveness
+      responses:
+        200:
+          description: Liveness response
+
+  /internal/readiness:
+    get:
+      operationId: Readiness
+      responses:
+        200:
+          description: Readiness response
+
+  /v1/short-url:
+    post:
+      operationId: CreateShortURL
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: "#/definitions/create-short-url-request"
+      responses:
+        201:
+          description: Short URL created successfully.
+          schema:
+            $ref: "#/definitions/create-short-url-response"
+        409:
+          description: Short URL already exists.
+          schema:
+            $ref: "#/definitions/error-response"
+        400:
+          description: Non-retryable client error.
+          schema:
+            $ref: "#/definitions/error-response"
+        500:
+          description: Retryable server error
+          schema:
+            $ref: "#/definitions/error-response"
+
+  /v1/target-url/{shortUrl}:
+    get:
+      operationId: GetTargetURL
+      parameters:
+        - in: path
+          type: string
+          required: true
+          name: shortUrl
+      responses:
+        200:
+          description: Response containing the target URL.
+          schema:
+            $ref: "#/definitions/get-target-url-response"
+        404:
+          description: Short URL does not exist.
+          schema:
+            $ref: "#/definitions/error-response"
+        400:
+          description: Non-retryable client error.
+          schema:
+            $ref: "#/definitions/error-response"
+        500:
+          description: Retryable server error
+          schema:
+            $ref: "#/definitions/error-response"
+
+definitions:
+  error-response:
+    description: Error response.
+    required:
+      - message
+    properties:
+      message:
+        type: string
+      code:
+        type: string
+
+  create-short-url-request:
+    description: Request for creating a short URL.
+    required:
+      - longUrl
+      - shortUrl
+    properties:
+      longUrl:
+        type: string
+        minLength: 1
+        maxLength: 2048
+      shortUrl:
+        type: string
+        minLength: 1
+        maxLength: 10
+
+  create-short-url-response:
+    description: Response for short URL creation request.
+    required:
+      - shortUrl
+    properties:
+      shortUrl:
+        type: string
+
+  get-target-url-response:
+    description: Response containing the target URL for a short URL.
+    required:
+      - targetUrl
+    properties:
+      targetUrl:
+        type: string
